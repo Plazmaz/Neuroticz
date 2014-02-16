@@ -76,6 +76,7 @@ public class FileUtil {
 
 					try {
 						out.write("\n"+line);
+						System.out.println(line);
 					} catch (IOException e) {
 						e.printStackTrace();
 					}
@@ -93,6 +94,14 @@ public class FileUtil {
 				// wordOccurences.put(word, 1); // NOT ZERO!!!!(seriously, this
 				// // is the first time we
 				// // found it!)
+			}
+			System.out.println();
+			System.out.println();
+			try {
+				out.write("\n");
+				out.write("\n");
+			} catch (IOException e) {
+				e.printStackTrace();
 			}
 			fileCount++;
 		}
