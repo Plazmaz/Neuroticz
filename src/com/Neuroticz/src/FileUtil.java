@@ -69,20 +69,21 @@ public class FileUtil {
 									// delimiters are spaces
 					continue;
 				line = line.toLowerCase();
-				Pattern pattern = Pattern.compile("^ingredients:?|(\\s\\d{1,5})?[/]\\d{1,3}?");
-//				Pattern.
+				Pattern pattern = Pattern
+						.compile("^ingredients:?|(\\s\\d{1,5})?[/]\\d{1,3}?");
+				// Pattern.
 				Matcher m = pattern.matcher(line);
 				if (m.find()) {
 
 					try {
-						out.write("\n"+line);
+						out.write("\n" + line);
 						System.out.println(line);
 					} catch (IOException e) {
 						e.printStackTrace();
 					}
-//					if()
+					// if()
 					continue;
-					
+
 				}
 				// if (wordOccurences.containsKey(word)) { // if this is not the
 				// // first time we've
@@ -112,29 +113,27 @@ public class FileUtil {
 		}
 		return wordOccurences;
 	}
+
 	/**
 	 * Compile input and expected data for the learning process.
-	 * @param inputFolder The folder with all of the input files
-	 * @param expectedFolder The folder with all expected outputs
+	 * 
+	 * @param inputFolder
+	 *            The folder with all of the input files
+	 * @param expectedFolder
+	 *            The folder with all expected outputs
 	 * @return learningData The data compiled for input to the neural network
 	 */
-	public static HashMap<String, String> compileLearningData(File inputFolder, File expectedFolder) {
-		ArrayList<String> inputData = new ArrayList<String>();
-		ArrayList<String> expectedData = new ArrayList<String>();
+	public static HashMap<File, String> compileLearningData(File inputFolder) {
+		HashMap<File, String> learningData = new HashMap<File, String>();
 		for (File subFile : inputFolder.listFiles()) {
 			ArrayList<String> linesArr = parseFile(subFile.getAbsolutePath());
-			inputData.addAll(linesArr);
-		}
-		for(File subFile : expectedFolder.listFiles()) {
-			ArrayList<String> linesArr = parseFile(subFile.getAbsolutePath());
-			expectedData.addAll(linesArr);
-		}
-		HashMap<String, String> learningData = new HashMap<String, String>();
-		for(int i = 0; i < inputData.size(); i++) {
-			for(int j = i; j < expectedData.size(); j++) {
-				learningData.put(inputData.get(i), expectedData.get(j));
+			String data = "";
+			for (String s : linesArr) {
+				data += s;
 			}
+			learningData.put(subFile, data);
 		}
+
 		return learningData;
 	}
 }
