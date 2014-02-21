@@ -30,7 +30,7 @@ public class Neuroticz {
 
 	public Neuroticz() {
 
-		Display.showDisplay("Neuroticz Visualizer", new Dimension(700, 700),
+		Display.showDisplay("Neuroticz Visualizer", new Dimension(1400, 500),
 				Color.BLACK);
 		// HashMap<String, Integer> instances =
 		// util.learnWordImportance("recipes");
@@ -104,7 +104,7 @@ public class Neuroticz {
 		System.out.println("Paint Ticks: " + timer.getElapsedTimeMilis());
 		System.out.println("Output: " + net.getNetworkOutput());
 		try {
-			Thread.sleep(10000);
+			Thread.sleep(50);
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
@@ -116,10 +116,11 @@ public class Neuroticz {
 
 	public void draw(NNetwork network) {
 		Display.repaint();
-		
+
 		int column = 0;
 		for (Input in : network.getInputNodesInNetwork()) {
-			in.paint(130 + (column * Node.NODE_DRAW_SIZE * VERTICAL_NODE_SPACING),
+			in.paint(
+					130 + (column * Node.NODE_DRAW_SIZE * VERTICAL_NODE_SPACING),
 					1 * (Node.NODE_DRAW_SIZE * 2));
 			column++;
 		}
@@ -132,8 +133,8 @@ public class Neuroticz {
 			y++;
 			n.setDisplayColor(color);
 
-			n.paint(180 + (column * Node.NODE_DRAW_SIZE * VERTICAL_NODE_SPACING), y
-					* (Node.NODE_DRAW_SIZE * 2));
+			n.paint(180 + (column * Node.NODE_DRAW_SIZE * VERTICAL_NODE_SPACING),
+					y * (Node.NODE_DRAW_SIZE * 2));
 			if (network.getNeuronsInNetwork().indexOf(n) % 5 == 0) {
 				column++;
 				y = 1;
@@ -145,7 +146,8 @@ public class Neuroticz {
 		}
 		column = 0;
 		for (Output out : network.getOutputNodesInNetwork()) {
-			out.paint(200 + (column * Node.NODE_DRAW_SIZE * VERTICAL_NODE_SPACING),
+			out.paint(
+					200 + (column * Node.NODE_DRAW_SIZE * VERTICAL_NODE_SPACING),
 					Node.NODE_DRAW_SIZE * 20);
 			column++;
 		}
@@ -163,7 +165,11 @@ public class Neuroticz {
 
 			Color displayColor = Display.getDisplayBackgroundColor();
 			Display.setDisplayBackgroundColor(Color.YELLOW);
-			Display.setStrokeWidth(connection.getSynapseWeight()/5);
+			if (connection.getSynapseWeight() > 20)
+				Display.setStrokeWidth(5);
+			else {
+				Display.setStrokeWidth(1);
+			}
 			Display.drawLine(originDrawingPoint.x, originDrawingPoint.y,
 					destinationDrawingPoint.x, destinationDrawingPoint.y);
 			Display.setDisplayBackgroundColor(displayColor);
