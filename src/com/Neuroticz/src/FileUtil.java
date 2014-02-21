@@ -11,8 +11,6 @@ import java.util.HashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import me.dylan.NNL.RegParams;
-
 public class FileUtil {
 	public int fileCount = 0;
 
@@ -27,7 +25,7 @@ public class FileUtil {
 		try {
 			String line;
 			float likelyhood = 0; // out of 100
-			String[] regArray = RegParams.regParamsDel.split(", ");
+//			String[] regArray = RegParams.regParamsDel.split(", ");
 			while ((line = in.readLine()) != null) {
 				fileContents.add(line);
 				// for(String word : line.split(" "))
