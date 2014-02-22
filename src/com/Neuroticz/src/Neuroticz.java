@@ -24,36 +24,30 @@ import me.dylan.NNL.Visualizer.Display;
 public class Neuroticz {
 	Timer timer = new Timer();
 	public static final int NETWORKS_PER_GENERATION = 1;
-	public static final int NETWORK_DISPLAY_OFFSET_MULTIPLIER = 10;
-	public static final int VERTICAL_NODE_SPACING = 35;
+	public static final int NETWORK_DISPLAY_OFFSET_MULTIPLIER = 15;
+	public static final int HORIZONTAL_NODE_SPACING = 15;
+	public static final int VERTICAL_NODE_SPACING = 2;
 	ArrayList<NNetwork> networks = new ArrayList<NNetwork>();
 
 	public Neuroticz() {
 
-		Display.showDisplay("Neuroticz Visualizer", new Dimension(1400, 500),
+		Display.showDisplay("Neuroticz Visualizer", new Dimension(1400, 700),
 				Color.BLACK);
-		// HashMap<String, Integer> instances =
-		// util.learnWordImportance("recipes");
-		// System.out.println("FileCount: " + util.fileCount);
-		// for(String s : instances.keySet()) {
-		// int wordAmt = instances.get(s);
-		// float wordWeight = (wordAmt/(float)util.fileCount)/100;
-		// System.out.println(s + " WordOccurences:" + wordAmt +
-		// " WordWeight:" + wordWeight);
-		// //System.out.println(s + " : " +
-		// (float)(instances.get(s)/util.fileCount));
-		// }
 
 		HashMap<File, String> indata = FileUtil.compileLearningData(new File(
 				"recipes"));
 		int keySize = indata.keySet().size() - 1;
+		// NNetwork net = NetworkUtil.initializeNetwork(
+		// 20 * NNLib.GLOBAL_RANDOM.nextInt(keySize), 0, 1);
+		// Input in = new Input();
+		// in.setInformation(new Value("L"));
+		//
+		// net.addInputNodeToNetwork(in);
+
 		for (int i = 0; i < NETWORKS_PER_GENERATION; i++) {
 
-			NNetwork net = NetworkUtil.initializeNetwork(20/*
-															 * NNLib.GLOBAL_RANDOM
-															 * .nextInt(keySize)
-															 */,
-					NNLib.GLOBAL_RANDOM.nextInt(keySize), 2);
+			NNetwork net = NetworkUtil.initializeNetwork(
+					20, 2, 1);
 			for (File key : indata.keySet()) {
 				Input in = new Input();
 				String outData = "";
@@ -66,6 +60,7 @@ public class Neuroticz {
 			net.randomizeConnections();
 			networks.add(net);
 		}
+
 		ThreadUtil.spinThreadForPool("mainLoop", new Runnable() {
 
 			@Override
@@ -118,23 +113,20 @@ public class Neuroticz {
 		Display.repaint();
 
 		int column = 0;
+		drawSynapses(network);
 		for (Input in : network.getInputNodesInNetwork()) {
 			in.paint(
-					130 + (column * Node.NODE_DRAW_SIZE * VERTICAL_NODE_SPACING),
-					1 * (Node.NODE_DRAW_SIZE * 2));
+					130 + (column * Node.NODE_DRAW_SIZE * HORIZONTAL_NODE_SPACING),
+					1 * (Node.NODE_DRAW_SIZE * 2) * VERTICAL_NODE_SPACING, network.getInputNodesInNetwork().size());
 			column++;
 		}
 		int y = 1;
-		Random rand = NNLib.GLOBAL_RANDOM;
-		Color color = new Color(rand.nextInt(255), rand.nextInt(255),
-				rand.nextInt(255));
 		column = 0;
 		for (Neuron n : network.getNeuronsInNetwork()) {
-			y++;
-			n.setDisplayColor(color);
+			y += 1 + network.getNeuronsInNetwork().indexOf(n) % 4;
 
-			n.paint(180 + (column * Node.NODE_DRAW_SIZE * VERTICAL_NODE_SPACING),
-					y * (Node.NODE_DRAW_SIZE * 2));
+			n.paint(180 + (column * Node.NODE_DRAW_SIZE * HORIZONTAL_NODE_SPACING),
+					y * (Node.NODE_DRAW_SIZE * 2) * VERTICAL_NODE_SPACING, network.getNeuronsInNetwork().size());
 			if (network.getNeuronsInNetwork().indexOf(n) % 5 == 0) {
 				column++;
 				y = 1;
@@ -147,11 +139,11 @@ public class Neuroticz {
 		column = 0;
 		for (Output out : network.getOutputNodesInNetwork()) {
 			out.paint(
-					200 + (column * Node.NODE_DRAW_SIZE * VERTICAL_NODE_SPACING),
-					Node.NODE_DRAW_SIZE * 20);
+					200 + (column * Node.NODE_DRAW_SIZE * HORIZONTAL_NODE_SPACING),
+					Node.NODE_DRAW_SIZE * 20 * VERTICAL_NODE_SPACING, network
+							.getOutputNodesInNetwork().size());
 			column++;
 		}
-		drawSynapses(network);
 	}
 
 	public void drawSynapses(NNetwork net) {
@@ -164,12 +156,8 @@ public class Neuroticz {
 					.getPaintCoords();
 
 			Color displayColor = Display.getDisplayBackgroundColor();
-			Display.setDisplayBackgroundColor(Color.YELLOW);
-			if (connection.getSynapseWeight() > 20)
-				Display.setStrokeWidth(5);
-			else {
-				Display.setStrokeWidth(1);
-			}
+			Display.setDisplayBackgroundColor(NetworkUtil
+					.returnWeightColor(connection.getSynapseWeight()));
 			Display.drawLine(originDrawingPoint.x, originDrawingPoint.y,
 					destinationDrawingPoint.x, destinationDrawingPoint.y);
 			Display.setDisplayBackgroundColor(displayColor);
