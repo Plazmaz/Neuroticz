@@ -4,70 +4,108 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Point;
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Random;
 
 import me.dylan.NNL.Input;
 import me.dylan.NNL.NNLib;
 import me.dylan.NNL.NNetwork;
-import me.dylan.NNL.Neuron;
+import me.dylan.NNL.HiddenNode;
 import me.dylan.NNL.Node;
 import me.dylan.NNL.Output;
 import me.dylan.NNL.Synapse;
 import me.dylan.NNL.Value;
+import me.dylan.NNL.NNLib.NodeType;
+import me.dylan.NNL.Test.TestUtil;
 import me.dylan.NNL.Utils.NetworkUtil;
+import me.dylan.NNL.Utils.StringUtil;
 import me.dylan.NNL.Utils.ThreadUtil;
 import me.dylan.NNL.Visualizer.Display;
 
 public class Neuroticz {
 	Timer timer = new Timer();
 	public static final int NETWORKS_PER_GENERATION = 1;
-	public static final int NETWORK_DISPLAY_OFFSET_MULTIPLIER = 15;
-	public static final int HORIZONTAL_NODE_SPACING = 15;
-	public static final int VERTICAL_NODE_SPACING = 2;
-	ArrayList<NNetwork> networks = new ArrayList<NNetwork>();
+	public static final int NETWORK_DISPLAY_OFFSET_MULTIPLIER = 1;
+	public static final int HORIZONTAL_NODE_SPACING = 1;
+	public static final int VERTICAL_NODE_SPACING = 1;
+	public static final int LEFT_NODE_SHIFT = 1;
+	ArrayList<NNetwork> networkList = new ArrayList<NNetwork>();
+	ArrayList<String> words = new ArrayList<String>();
 
 	public Neuroticz() {
 
 		Display.showDisplay("Neuroticz Visualizer", new Dimension(1400, 700),
 				Color.BLACK);
 
-		HashMap<File, String> indata = FileUtil.compileLearningData(new File(
-				"recipes"));
-		int keySize = indata.keySet().size() - 1;
-		// NNetwork net = NetworkUtil.initializeNetwork(
-		// 20 * NNLib.GLOBAL_RANDOM.nextInt(keySize), 0, 1);
-		// Input in = new Input();
-		// in.setInformation(new Value("L"));
+		List<File> indata = FileUtil.compileLearningData(new File("recipes"));
+
+		NNetwork initialNet = new NNetwork();
 		//
-		// net.addInputNodeToNetwork(in);
-
-		for (int i = 0; i < NETWORKS_PER_GENERATION; i++) {
-
-			NNetwork net = NetworkUtil.initializeNetwork(
-					20, 2, 1);
-			for (File key : indata.keySet()) {
-				Input in = new Input();
-				String outData = "";
-				for (String str : indata.get(key).split("\\s")) {
-					outData += str;
-				}
-				in.setInformation(new Value(outData));
-				net.addInputNodeToNetwork(in);
+		for (File trainingData : indata) {
+			Input inputNode = new Input();
+			BufferedReader fileIn = null;
+			try {
+				fileIn = new BufferedReader(new FileReader(trainingData));
+			} catch (FileNotFoundException e) {
+				e.printStackTrace();
 			}
-			net.randomizeConnections();
-			networks.add(net);
+			String inLine = "";
+			try {
+				while ((inLine = fileIn.readLine()) != null) {
+					ArrayList<String> linePairs = StringUtil
+							.getLetterPairsFromWords(inLine);
+					for (String pair : linePairs) {
+						if (!pair.isEmpty()) {
+							initialNet.addHiddenNodeToNetwork(NetworkUtil
+									.createHidden(pair,
+											inputNode.getNodeVariety()));
+						}
+					}
+				}
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+			initialNet.addInputNodeToNetwork(inputNode);
+
+			/*
+			 * String inputNodeValue = in.getInputData().getValue(); for (int i
+			 * = 0; i < inputNodeValue.length(); i += 2) {
+			 * initialNet.addHiddenToNetwork(NetworkUtil.createHidden(
+			 * inputNodeValue, NodeType)); }
+			 */
+			// ThreadUtil.spinThreadForPool("processFile", new Runnable() {
+			//
+			// @Override
+			// public void run() {
+			// // String[] lines = in.getInputData()
+			// // while(in.ge)
+			// }
+			//
+			// });
+		}
+		if (TestUtil.AnyNodesExist(initialNet)) {
+			TestUtil.WhatNodesExist(initialNet);
 		}
 
+		initialNet.randomizeConnections();
+		networkList.add(initialNet);
+
+		// net.randomizeConnections();
 		ThreadUtil.spinThreadForPool("mainLoop", new Runnable() {
 
 			@Override
 			public void run() {
 				while (!Thread.interrupted()) {
 					int netcount = 0;
-					for (NNetwork net : networks) {
+					for (NNetwork net : networkList) {
+
 						netcount++;
 						Display.setOffset(new Point(netcount
 								* NETWORK_DISPLAY_OFFSET_MULTIPLIER, 0));
@@ -86,20 +124,20 @@ public class Neuroticz {
 		// timer.start();
 		Display.repaint();
 		timer.start();
-		for (Neuron n : net.getNeuronsInNetwork()) {
+		for (HiddenNode n : net.getHiddenNodesInNetwork()) {
 			n.doTick();
 		}
 		timer.end();
-		System.out.println("Neuron Ticks: " + timer.getElapsedTimeMilis());
+		// System.out.println("Hidden Milis: " + timer.getElapsedTimeMilis());
 		// timer.end();
 		// System.out.println(timer.getElapsedTimeMilis());
 		timer.start();
 		draw(net);
 		timer.end();
-		System.out.println("Paint Ticks: " + timer.getElapsedTimeMilis());
-		System.out.println("Output: " + net.getNetworkOutput());
+		// System.out.println("Paint Milis: " + timer.getElapsedTimeMilis());
+		// System.out.println("Output: " + net.getNetworkOutput());
 		try {
-			Thread.sleep(50);
+			Thread.sleep(20);
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
@@ -112,23 +150,23 @@ public class Neuroticz {
 	public void draw(NNetwork network) {
 		Display.repaint();
 
-		int column = 0;
-		drawSynapses(network);
+		int row = 0;
+		 drawSynapses(network);
 		for (Input in : network.getInputNodesInNetwork()) {
-			in.paint(
-					130 + (column * Node.NODE_DRAW_SIZE * HORIZONTAL_NODE_SPACING),
-					1 * (Node.NODE_DRAW_SIZE * 2) * VERTICAL_NODE_SPACING, network.getInputNodesInNetwork().size());
-			column++;
+			int x = LEFT_NODE_SHIFT + 130
+					+ (row * Node.NODE_DRAW_SIZE * HORIZONTAL_NODE_SPACING);
+			in.paint(x, 1 * (Node.NODE_DRAW_SIZE * 2) * VERTICAL_NODE_SPACING);
+			row++;
 		}
 		int y = 1;
-		column = 0;
-		for (Neuron n : network.getNeuronsInNetwork()) {
-			y += 1 + network.getNeuronsInNetwork().indexOf(n) % 4;
-
-			n.paint(180 + (column * Node.NODE_DRAW_SIZE * HORIZONTAL_NODE_SPACING),
-					y * (Node.NODE_DRAW_SIZE * 2) * VERTICAL_NODE_SPACING, network.getNeuronsInNetwork().size());
-			if (network.getNeuronsInNetwork().indexOf(n) % 5 == 0) {
-				column++;
+		row = 0;
+		for (HiddenNode n : network.getHiddenNodesInNetwork()) {
+			y += 1 + network.getHiddenNodesInNetwork().indexOf(n) % 4;
+			int x = LEFT_NODE_SHIFT + 180
+					+ (row * Node.NODE_DRAW_SIZE * HORIZONTAL_NODE_SPACING);
+			n.paint(x, y * (Node.NODE_DRAW_SIZE * 2) * VERTICAL_NODE_SPACING);
+			if (network.getHiddenNodesInNetwork().indexOf(n) % 10 == 0) {
+				row++;
 				y = 1;
 			}
 			// if(column >= 2) {
@@ -136,13 +174,13 @@ public class Neuroticz {
 			// }
 
 		}
-		column = 0;
+		row = 0;
 		for (Output out : network.getOutputNodesInNetwork()) {
-			out.paint(
-					200 + (column * Node.NODE_DRAW_SIZE * HORIZONTAL_NODE_SPACING),
-					Node.NODE_DRAW_SIZE * 20 * VERTICAL_NODE_SPACING, network
-							.getOutputNodesInNetwork().size());
-			column++;
+			int x = LEFT_NODE_SHIFT + 180 + 200
+					+ (row * Node.NODE_DRAW_SIZE * HORIZONTAL_NODE_SPACING);
+			
+			out.paint(x, Node.NODE_DRAW_SIZE * 20 * VERTICAL_NODE_SPACING);
+			row++;
 		}
 	}
 

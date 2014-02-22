@@ -7,14 +7,16 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class FileUtil {
 	public int fileCount = 0;
 
-	public static ArrayList<String> parseFile(String path) {
+	public static ArrayList<String> parseFileByLine(String path) {
 		ArrayList<String> fileContents = new ArrayList<String>();
 		BufferedReader in = null;
 		try {
@@ -25,7 +27,7 @@ public class FileUtil {
 		try {
 			String line;
 			float likelyhood = 0; // out of 100
-//			String[] regArray = RegParams.regParamsDel.split(", ");
+			// String[] regArray = RegParams.regParamsDel.split(", ");
 			while ((line = in.readLine()) != null) {
 				fileContents.add(line);
 				// for(String word : line.split(" "))
@@ -60,7 +62,8 @@ public class FileUtil {
 		}
 
 		for (File subFile : new File(folderPath).listFiles()) {
-			ArrayList<String> linesArr = parseFile(subFile.getAbsolutePath());
+			ArrayList<String> linesArr = parseFileByLine(subFile
+					.getAbsolutePath());
 			// wordsStr = wordsStr.replaceAll("[^ \\\na-zA-Z0-9]", " ");
 			for (String line : linesArr) {
 				if (line.isEmpty()) // this is due to the fact that our
@@ -121,17 +124,7 @@ public class FileUtil {
 	 *            The folder with all expected outputs
 	 * @return learningData The data compiled for input to the neural network
 	 */
-	public static HashMap<File, String> compileLearningData(File inputFolder) {
-		HashMap<File, String> learningData = new HashMap<File, String>();
-		for (File subFile : inputFolder.listFiles()) {
-			ArrayList<String> linesArr = parseFile(subFile.getAbsolutePath());
-			String data = "";
-			for (String s : linesArr) {
-				data += s;
-			}
-			learningData.put(subFile, data);
-		}
-
-		return learningData;
+	public static List<File> compileLearningData(File inputFolder) {
+		return Arrays.asList( inputFolder.listFiles());
 	}
 }
