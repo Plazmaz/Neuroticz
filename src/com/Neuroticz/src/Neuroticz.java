@@ -2,7 +2,6 @@ package com.Neuroticz.src;
 
 import java.awt.Color;
 import java.awt.Dimension;
-import java.awt.Graphics;
 import java.awt.Point;
 import java.io.BufferedReader;
 import java.io.File;
@@ -10,20 +9,16 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Random;
 
 import me.dylan.NNL.Input;
-import me.dylan.NNL.NNLib;
 import me.dylan.NNL.NNetwork;
 import me.dylan.NNL.HiddenNode;
 import me.dylan.NNL.Node;
 import me.dylan.NNL.Output;
 import me.dylan.NNL.Synapse;
-import me.dylan.NNL.Value;
-import me.dylan.NNL.NNLib.NodeType;
 import me.dylan.NNL.Test.TestUtil;
+import me.dylan.NNL.Utils.ArrayUtil;
 import me.dylan.NNL.Utils.NetworkUtil;
 import me.dylan.NNL.Utils.StringUtil;
 import me.dylan.NNL.Utils.ThreadUtil;
@@ -31,72 +26,58 @@ import me.dylan.NNL.Visualizer.Display;
 
 public class Neuroticz {
 	Timer timer = new Timer();
-	public static final int NETWORKS_PER_GENERATION = 1;
-	public static final int NETWORK_DISPLAY_OFFSET_MULTIPLIER = 1;
-	public static final int HORIZONTAL_NODE_SPACING = 1;
-	public static final int VERTICAL_NODE_SPACING = 1;
-	public static final int LEFT_NODE_SHIFT = 1;
-	ArrayList<NNetwork> networkList = new ArrayList<NNetwork>();
-	ArrayList<String> words = new ArrayList<String>();
+	public static final int NETWORKS_PER_GENERATION = 3;
+	public static final int NETWORK_DISPLAY_OFFSET_MULTIPLIER = 300;
+	public static final int HORIZONTAL_NODE_SPACING = 4;
+	public static final int VERTICAL_NODE_SPACING = 2;
+	public static final int LEFT_NODE_SHIFT = -400;
+	public static final int NETWORKS_TO_PICK_PER_GEN = 2;
+	ArrayList<NNetwork> mostFit = new ArrayList<NNetwork>();
+	ArrayList<NNetwork> allNetworks = new ArrayList<NNetwork>();
+	String desiredOutput = "";
 
 	public Neuroticz() {
 
-		Display.showDisplay("Neuroticz Visualizer", new Dimension(1400, 700),
+		Display.showDisplay("Neuroticz Visualizer", new Dimension(700, 700),
 				Color.BLACK);
 
 		List<File> indata = FileUtil.compileLearningData(new File("recipes"));
-
-		NNetwork initialNet = new NNetwork();
-		//
-		for (File trainingData : indata) {
-			Input inputNode = new Input();
-			BufferedReader fileIn = null;
-			try {
-				fileIn = new BufferedReader(new FileReader(trainingData));
-			} catch (FileNotFoundException e) {
-				e.printStackTrace();
-			}
-			String inLine = "";
-			try {
-				while ((inLine = fileIn.readLine()) != null) {
-					ArrayList<String> linePairs = StringUtil
-							.getLetterPairsFromWords(inLine);
-					for (String pair : linePairs) {
-						if (!pair.isEmpty()) {
-							initialNet.addHiddenNodeToNetwork(NetworkUtil
-									.createHidden(pair,
-											inputNode.getNodeVariety()));
+		for (int i = 0; i < NETWORKS_PER_GENERATION; i++) {
+			NNetwork initialNet = new NNetwork();
+			initialNet.addOutputNodeToNetwork(new Output());
+			//
+			for (File trainingData : indata) {
+				Input inputNode = new Input();
+				BufferedReader fileIn = null;
+				try {
+					fileIn = new BufferedReader(new FileReader(trainingData));
+				} catch (FileNotFoundException e) {
+					e.printStackTrace();
+				}
+				String inLine = "";
+				try {
+					while ((inLine = fileIn.readLine()) != null) {
+						desiredOutput += inLine;
+						if (!inLine.isEmpty()) {
+							HiddenNode hiddenNode = NetworkUtil.createHidden(
+									inLine, inputNode.getNodeVariety());
+							initialNet.addHiddenNodeToNetwork(hiddenNode);
 						}
 					}
+				} catch (IOException e) {
+					e.printStackTrace();
 				}
-			} catch (IOException e) {
-				e.printStackTrace();
+				initialNet.addInputNodeToNetwork(inputNode);
+
 			}
-			initialNet.addInputNodeToNetwork(inputNode);
-
-			/*
-			 * String inputNodeValue = in.getInputData().getValue(); for (int i
-			 * = 0; i < inputNodeValue.length(); i += 2) {
-			 * initialNet.addHiddenToNetwork(NetworkUtil.createHidden(
-			 * inputNodeValue, NodeType)); }
-			 */
-			// ThreadUtil.spinThreadForPool("processFile", new Runnable() {
-			//
-			// @Override
-			// public void run() {
-			// // String[] lines = in.getInputData()
-			// // while(in.ge)
-			// }
-			//
-			// });
+			if (TestUtil.AnyNodesExist(initialNet)) {
+				TestUtil.WhatNodesExist(initialNet);
+			}
+			System.out.println("Any hidden nodes have values assigned? "
+					+ TestUtil.AHiddenNodeHasValue(initialNet));
+			initialNet.randomizeConnections();
+			allNetworks.add(initialNet);
 		}
-		if (TestUtil.AnyNodesExist(initialNet)) {
-			TestUtil.WhatNodesExist(initialNet);
-		}
-
-		initialNet.randomizeConnections();
-		networkList.add(initialNet);
-
 		// net.randomizeConnections();
 		ThreadUtil.spinThreadForPool("mainLoop", new Runnable() {
 
@@ -104,30 +85,61 @@ public class Neuroticz {
 			public void run() {
 				while (!Thread.interrupted()) {
 					int netcount = 0;
-					for (NNetwork net : networkList) {
+					ArrayList<NNetwork> networksClone = (ArrayList<NNetwork>) allNetworks
+							.clone();
+					for (NNetwork net : networksClone) {
 
 						netcount++;
 						Display.setOffset(new Point(netcount
 								* NETWORK_DISPLAY_OFFSET_MULTIPLIER, 0));
-						runVisualizeLoop(net);
+						doMainLoopTick(net);
 						Display.setOffset(new Point(-netcount
 								* NETWORK_DISPLAY_OFFSET_MULTIPLIER, 0));
+						int matchPercentage = net
+								.getNetworkSimilarityPercentage(desiredOutput);
+						if (matchPercentage < 90) {
+							if (!mostFit.isEmpty()) {
+								// allNetworks.clear();
+								if (matchPercentage > mostFit.get(0)
+										.getNetworkSimilarityPercentage(
+												desiredOutput)) {
+									mostFit = ArrayUtil.shiftNetworkArray(
+											mostFit, 1);
+									mostFit.set(0, net);
+									NNetwork parentNet1 = mostFit.get(0);
+									NNetwork parentNet2 = mostFit.get(1);
+									ArrayList<NNetwork> parentNetworks = new ArrayList<NNetwork>();
+									parentNetworks.add(parentNet1);
+									parentNetworks.add(parentNet2);
+									for (int i = 0; i < NETWORKS_PER_GENERATION; i++) {
+										allNetworks.add(NetworkUtil
+												.breedNetworks(parentNetworks,
+														80));
+									}
+								}
+							} else {
+								mostFit.addAll(allNetworks);
+							}
+
+						}
 					}
 				}
 			}
 		});
 	}
 
-	public void runVisualizeLoop(NNetwork net) {
-		// int errorPercentage =
-		// initialNet.getErrorPercentage(data.get(key));
+	public void doMainLoopTick(NNetwork net) {
+
 		// timer.start();
 		Display.repaint();
-		timer.start();
+		for (Input in : net.getInputNodesInNetwork()) {
+			in.activateInputNode();
+		}
+		// timer.start();
 		for (HiddenNode n : net.getHiddenNodesInNetwork()) {
 			n.doTick();
 		}
-		timer.end();
+		// timer.end();
 		// System.out.println("Hidden Milis: " + timer.getElapsedTimeMilis());
 		// timer.end();
 		// System.out.println(timer.getElapsedTimeMilis());
@@ -135,7 +147,7 @@ public class Neuroticz {
 		draw(net);
 		timer.end();
 		// System.out.println("Paint Milis: " + timer.getElapsedTimeMilis());
-		// System.out.println("Output: " + net.getNetworkOutput());
+		System.out.println("Output: " + net.getNetworkOutput());
 		try {
 			Thread.sleep(20);
 		} catch (InterruptedException e) {
@@ -151,7 +163,7 @@ public class Neuroticz {
 		Display.repaint();
 
 		int row = 0;
-		 drawSynapses(network);
+		drawSynapses(network);
 		for (Input in : network.getInputNodesInNetwork()) {
 			int x = LEFT_NODE_SHIFT + 130
 					+ (row * Node.NODE_DRAW_SIZE * HORIZONTAL_NODE_SPACING);
@@ -161,7 +173,7 @@ public class Neuroticz {
 		int y = 1;
 		row = 0;
 		for (HiddenNode n : network.getHiddenNodesInNetwork()) {
-			y += 1 + network.getHiddenNodesInNetwork().indexOf(n) % 4;
+			y += 1 /* + network.getHiddenNodesInNetwork().indexOf(n) % 4 */;
 			int x = LEFT_NODE_SHIFT + 180
 					+ (row * Node.NODE_DRAW_SIZE * HORIZONTAL_NODE_SPACING);
 			n.paint(x, y * (Node.NODE_DRAW_SIZE * 2) * VERTICAL_NODE_SPACING);
@@ -178,7 +190,7 @@ public class Neuroticz {
 		for (Output out : network.getOutputNodesInNetwork()) {
 			int x = LEFT_NODE_SHIFT + 180 + 200
 					+ (row * Node.NODE_DRAW_SIZE * HORIZONTAL_NODE_SPACING);
-			
+
 			out.paint(x, Node.NODE_DRAW_SIZE * 20 * VERTICAL_NODE_SPACING);
 			row++;
 		}
