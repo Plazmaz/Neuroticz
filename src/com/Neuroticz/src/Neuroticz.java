@@ -32,21 +32,16 @@ public class Neuroticz {
     public static final int NETWORK_DISPLAY_OFFSET_MULTIPLIER = 300;
     public static final double HORIZONTAL_NODE_SPACING = 4;
     public static final double VERTICAL_NODE_SPACING = 2;
-    public static int LEFT_NODE_SHIFT = 0;
-    public static int TOP_NODE_SHIFT = 0;
     public static int TOP_SHIFT_INIT = 100;
-    /**
-     * This is a how much to add to the network survival threshold(beginning at
-     * the average score of all networks) this is a multiplier as a fraction of
-     * the average
-     */
-    public static final double NETWORK_SURVIVAL_THRESHOLD_ADDITIVE = 1;
+    public static Point NODE_SHIFT = new Point(0, TOP_SHIFT_INIT);
+    private static Point NODE_SHIFT_INIT = NODE_SHIFT;
+    private boolean panning = false;
     MainLoop mainLoop;
     String desiredOutput = "";
 
     public Neuroticz() {
 
-	Display.showDisplay("Neuroticz Visualizer", new Dimension(700, 700),
+	Display.showDisplay("Neuroticz Visualizer", new Dimension(1400, 700),
 		Color.BLACK);
 	Display.setMouseLocation(new Point(Display.getWindowLocOnScreen().x
 		+ Display.getWidth() / 2, Display.getWindowLocOnScreen().y
@@ -55,13 +50,17 @@ public class Neuroticz {
 
 	    @Override
 	    public void mouseMoved(MouseEvent evt) {
-		LEFT_NODE_SHIFT = Display.getWidth() / 2 - evt.getX();
-		TOP_NODE_SHIFT = TOP_SHIFT_INIT + Display.getHeight() / 2
-			- evt.getY();
+		// LEFT_NODE_SHIFT = Display.getWidth() / 2 - evt.getX();
+		// TOP_NODE_SHIFT = TOP_SHIFT_INIT + Display.getHeight() / 2
+		// - evt.getY();
 	    }
 
 	    @Override
 	    public void mouseDragged(MouseEvent evt) {
+//		evt.translatePoint(evt.getComponent().getX(), evt
+//			.getComponent().getY());
+		panning = true;
+		NODE_SHIFT.translate((int)(evt.getX() - (NODE_SHIFT.x*2)), (int)(evt.getY() - (NODE_SHIFT.y*2)));
 		// Point mouseLoc = evt.getPoint();
 		// LEFT_NODE_SHIFT = Display.getWidth() / 2 - (int)
 		// mouseLoc.getX();
@@ -73,18 +72,19 @@ public class Neuroticz {
 	Display.addMouseListener(new MouseListener() {
 	    @Override
 	    public void mouseReleased(MouseEvent e) {
-
+		if (!panning) {
+		    if (e.getButton() == MouseEvent.BUTTON1) {
+			ZOOM_FACTOR += 0.5;
+		    } else if (e.getButton() == MouseEvent.BUTTON3) {
+			ZOOM_FACTOR -= 0.5;
+		    }
+		}
+		System.out.println("Updated zoom to " + ZOOM_FACTOR);
+		panning = false;
 	    }
 
 	    @Override
 	    public void mousePressed(MouseEvent e) {
-
-		if (e.getButton() == MouseEvent.BUTTON1) {
-		    ZOOM_FACTOR += 0.5;
-		} else if (e.getButton() == MouseEvent.BUTTON3) {
-		    ZOOM_FACTOR -= 0.5;
-		}
-		System.out.println("Updated zoom to " + ZOOM_FACTOR);
 	    }
 
 	    @Override
@@ -164,11 +164,11 @@ public class Neuroticz {
 				* Neuroticz.NETWORK_DISPLAY_OFFSET_MULTIPLIER,
 				0));
 		    }
-		    try {
-			Thread.sleep(20);
-		    } catch (InterruptedException e) {
-			e.printStackTrace();
-		    }
+		     try {
+		     Thread.sleep(50);
+		     } catch (InterruptedException e) {
+		     e.printStackTrace();
+		     }
 		}
 	    }
 	});
@@ -184,12 +184,12 @@ public class Neuroticz {
 	ArrayList<Input> netInputNodes = (ArrayList<Input>) network
 		.getInputNodesInNetwork().clone();
 	for (Input in : netInputNodes) {
-	    double x = LEFT_NODE_SHIFT
+	    double x = NODE_SHIFT.x
 		    + 130
 		    + (row * Node.NODE_DRAW_SIZE * HORIZONTAL_NODE_SPACING * ZOOM_FACTOR);
 	    in.paint((int) x, (int) ((Node.NODE_DRAW_SIZE * 2)
 		    * VERTICAL_NODE_SPACING * ZOOM_FACTOR)
-		    + TOP_NODE_SHIFT);
+		    + NODE_SHIFT.y);
 	    row++;
 	}
 	int y = 1;
@@ -198,12 +198,12 @@ public class Neuroticz {
 		.getHiddenNodesInNetwork().clone();
 	for (HiddenNode n : netHiddenNodes) {
 	    y += 1 /* + network.getHiddenNodesInNetwork().indexOf(n) % 4 */;
-	    double x = LEFT_NODE_SHIFT
+	    double x = NODE_SHIFT.x
 		    + 180
 		    + (row * Node.NODE_DRAW_SIZE * HORIZONTAL_NODE_SPACING * ZOOM_FACTOR);
 	    n.paint((int) x, (int) (y * (Node.NODE_DRAW_SIZE * 2)
 		    * VERTICAL_NODE_SPACING * ZOOM_FACTOR)
-		    + TOP_NODE_SHIFT);
+		    + NODE_SHIFT.y);
 	    if (network.getHiddenNodesInNetwork().indexOf(n) % 10 == 0) {
 		row++;
 		y = 1;
@@ -215,14 +215,14 @@ public class Neuroticz {
 	}
 	row = 0;
 	for (Output out : network.getOutputNodesInNetwork()) {
-	    double x = LEFT_NODE_SHIFT
+	    double x = NODE_SHIFT.x
 		    + 180
 		    + 200
 		    + (row * Node.NODE_DRAW_SIZE * HORIZONTAL_NODE_SPACING * ZOOM_FACTOR);
 
 	    out.paint((int) x, (int) (Node.NODE_DRAW_SIZE * 20
 		    * VERTICAL_NODE_SPACING * ZOOM_FACTOR)
-		    + TOP_NODE_SHIFT);
+		    + NODE_SHIFT.y);
 	    row++;
 	}
     }

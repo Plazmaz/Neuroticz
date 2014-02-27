@@ -10,6 +10,7 @@ import me.dylan.NNL.Output;
 import me.dylan.NNL.Synapse;
 import me.dylan.NNL.Utils.ArrayUtil;
 import me.dylan.NNL.Utils.NetworkUtil;
+import me.dylan.NNL.Visualizer.Display;
 
 public class MainLoop implements Runnable {
     private String desiredOutput;
@@ -28,6 +29,8 @@ public class MainLoop implements Runnable {
     @Override
     public void run() {
 	while (!Thread.interrupted()) {
+	    if(Display.isKeyDown(' '))
+		continue;
 	    ArrayList<NNetwork> allNetsClone = (ArrayList<NNetwork>) allNetworks
 		    .clone();
 	    for (NNetwork net : allNetsClone) {
@@ -45,6 +48,7 @@ public class MainLoop implements Runnable {
     public void doMainLoopTick(NNetwork net) {
 
 	// timer.start();
+	net.removeUnusedSynapses();
 	for (Input in : net.getInputNodesInNetwork()) {
 //	    if(NNLib.GLOBAL_RANDOM.nextInt(101)<=NNLib.CHANCE_FOR_INPUT_ACTIVATION)
 	    in.activateInputNode();
@@ -95,18 +99,18 @@ public class MainLoop implements Runnable {
 			continue;
 		    for (Synapse synapse : out.traceBackSynapses(true, net)) {
 			if (synapse.getSynapseWeight()
-				+ NNLib.SYNAPSE_ADDITIVE_PER_GENERATION <= NNLib.MAX_CONNECTION_WEIGHT) {
+				+ NNLib.SYNAPSE_MULTIPLIER_PER_GENERATION <= NNLib.MAX_CONNECTION_WEIGHT) {
 
 			    synapse.setSynapseWeight(synapse.getSynapseWeight()
-				    + NNLib.SYNAPSE_ADDITIVE_PER_GENERATION);
+				    * NNLib.SYNAPSE_MULTIPLIER_PER_GENERATION);
 
 			}
 		    }
 		}
 		// }
-		netsSortedByFitness.add(net);
-		ArrayUtil.swapItems(net, netsSortedByFitness.get(0),
-			netsSortedByFitness);
+//		netsSortedByFitness.add(net);
+//		ArrayUtil.swapItems(net, netsSortedByFitness.get(0),
+//			netsSortedByFitness);
 		// } else {
 		// net.randomizeConnections();
 		// }
