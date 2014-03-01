@@ -1,0 +1,39 @@
+get line #
+make node for each line with constant value
+pulse single line for each node from input
+try to pulse
+w*x
+weight * number of connected nodes
+10 lines = 10 pulses
+if pulse fails
+reduce synapse weight
+weight 
+ABC
+ACB
+CBA
+ABC
+A++ and A = good
+ACB
+C--
+
+a	d
+b	e
+c	f
+mark each node we've used
+if node matches increment
+else
+reduce weight, sort array by weight
+essentially brute force at the beginning
+use two lists, one unused, one used(open and closed)
+
+5 tablespoons lemon juice
+       tab les spo ons
+       les tab spo ons
+
+la
+lb	
+lc
+
+USE REGEX TO TELL A NEURON WHAT IT'S DOING UNTIL SUB NET GETS DOWN TO WORDS THEN IF NEEDED GO TO LETTERS
+
+If the node fails(percentage decreases) reduce synapse weight and trace back a step

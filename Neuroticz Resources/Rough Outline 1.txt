@@ -1,0 +1,5 @@
+Take document/data
+Look for patterns in the document(fed with word pairs)
+Determine what's important and what's not
+?
+profit
