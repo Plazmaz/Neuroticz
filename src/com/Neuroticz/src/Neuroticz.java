@@ -50,17 +50,17 @@ public class Neuroticz {
 
 	    @Override
 	    public void mouseMoved(MouseEvent evt) {
-		// LEFT_NODE_SHIFT = Display.getWidth() / 2 - evt.getX();
-		// TOP_NODE_SHIFT = TOP_SHIFT_INIT + Display.getHeight() / 2
-		// - evt.getY();
+		 NODE_SHIFT.x = Display.getWidth() / 2 - evt.getX();
+		 NODE_SHIFT.y = TOP_SHIFT_INIT + Display.getHeight() / 2
+		 - evt.getY();
 	    }
 
 	    @Override
 	    public void mouseDragged(MouseEvent evt) {
 //		evt.translatePoint(evt.getComponent().getX(), evt
 //			.getComponent().getY());
-		panning = true;
-		NODE_SHIFT.translate((int)(evt.getX() - (NODE_SHIFT.x*2)), (int)(evt.getY() - (NODE_SHIFT.y*2)));
+//		panning = true;
+//		NODE_SHIFT.translate((int)(evt.getX() - (NODE_SHIFT.x*2)), (int)(evt.getY() - (NODE_SHIFT.y*2)));
 		// Point mouseLoc = evt.getPoint();
 		// LEFT_NODE_SHIFT = Display.getWidth() / 2 - (int)
 		// mouseLoc.getX();
@@ -113,7 +113,7 @@ public class Neuroticz {
 	    try {
 		while ((inLine = fileIn.readLine()) != null) {
 		    if (!inLine.isEmpty() && inLine.trim().length() > 0) {
-			desiredOutput += inLine;
+			desiredOutput += "\n"+inLine;
 			tmpLines.add(inLine);
 		    }
 		}
@@ -125,21 +125,17 @@ public class Neuroticz {
 	mainLoop = new MainLoop(desiredOutput);
 	for (int i = 0; i < NETWORKS_ADDITION_PER_GENERATION; i++) {
 
-	    NNetwork initialNet = new NNetwork();
-	    initialNet.addOutputNodeToNetwork(new Output());
-	    initialNet.addInputNodeToNetwork(new Input());
-	    Input inputNode = new Input();
-	    for (String s : tmpLines) {
-		HiddenNode hiddenNode = NetworkUtil.createHidden(s,
-			inputNode.getNodeVariety());
-		initialNet.addHiddenNodeToNetwork(hiddenNode);
-	    }
+	    NNetwork initialNet = NetworkUtil.initializeNetwork(0, 1, 1, desiredOutput, tmpLines);
+//	    initialNet.addOutputNodeToNetwork(new Output());
+//	    Input inputNode = new Input(desiredOutput.split("\n"));
+//	    initialNet.addInputNodeToNetwork(inputNode);
 	    if (TestUtil.AnyNodesExist(initialNet)) {
 		TestUtil.WhatNodesExist(initialNet);
 	    }
 	    System.out.println("Any hidden nodes have values assigned? "
 		    + TestUtil.AHiddenNodeHasValue(initialNet));
-	    initialNet.connectAll();
+	    System.out.println("Are all synapses properly assigned? "+TestUtil.AreAllNodesConnected(initialNet));
+//	    initialNet.connectAll();
 	    mainLoop.allNetworks.add(initialNet);
 	}
 	// net.randomizeConnections();
@@ -179,8 +175,8 @@ public class Neuroticz {
     }
 
     public void draw(NNetwork network) {
-	int row = 0;
 	drawSynapses(network);
+	int row = 0;
 	ArrayList<Input> netInputNodes = (ArrayList<Input>) network
 		.getInputNodesInNetwork().clone();
 	for (Input in : netInputNodes) {
@@ -231,13 +227,11 @@ public class Neuroticz {
 	// net.removeUnusedSynapses();
 	ArrayList<Synapse> synapsesClone = (ArrayList<Synapse>) net
 		.getNetworkSynapses().clone();
-	synapsesClone = (ArrayList<Synapse>) synapsesClone.clone();
 	for (Synapse connection : synapsesClone) {
 	    if (connection == null
 		    || connection.getConnectionDestination() == null
 		    || connection.getConnectionOrigin() == null)
 		continue;
-	    if (!connection.hasPaintedInTick()) {
 		Point originDrawingPoint = connection.getConnectionOrigin().graphicsRepresentationObject
 			.getPaintCoords();
 		Point destinationDrawingPoint = connection
@@ -249,8 +243,6 @@ public class Neuroticz {
 		Display.drawLine(originDrawingPoint.x, originDrawingPoint.y,
 			destinationDrawingPoint.x, destinationDrawingPoint.y);
 		Display.setDisplayBackgroundColor(displayColor);
-		connection.setHasPaintedInTick(true);
-	    }
 	    // } else {
 	    //
 	    // }
