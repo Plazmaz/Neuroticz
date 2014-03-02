@@ -134,7 +134,7 @@ public class Neuroticz {
 	    }
 	    System.out.println("Any hidden nodes have values assigned? "
 		    + TestUtil.AHiddenNodeHasValue(initialNet));
-	    System.out.println("Are all synapses properly assigned? "+TestUtil.AreAllNodesConnected(initialNet));
+	    System.out.println("Are all synapses properly assigned? "+TestUtil.IsSynapseCountProper(initialNet));
 //	    initialNet.connectAll();
 	    mainLoop.allNetworks.add(initialNet);
 	}
@@ -240,9 +240,14 @@ public class Neuroticz {
 		Color displayColor = Display.getDisplayBackgroundColor();
 		Display.setDisplayBackgroundColor(NetworkUtil
 			.returnWeightColor(connection.getSynapseWeight()));
+		if(connection.doesPulseBack())
+		    Display.setDisplayBackgroundColor(Color.ORANGE);
+		else if(connection.hasPulsedInTick)
+		    Display.setDisplayBackgroundColor(Color.BLUE);
 		Display.drawLine(originDrawingPoint.x, originDrawingPoint.y,
 			destinationDrawingPoint.x, destinationDrawingPoint.y);
 		Display.setDisplayBackgroundColor(displayColor);
+		
 	    // } else {
 	    //
 	    // }
