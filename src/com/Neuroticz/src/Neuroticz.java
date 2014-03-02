@@ -220,7 +220,6 @@ public class Neuroticz {
 		    + NODE_SHIFT.y);
 	    row++;
 	}
-	Display.repaint();
     }
 
     public void drawSynapses(NNetwork net) {
