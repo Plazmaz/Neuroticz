@@ -2,7 +2,6 @@ package com.Neuroticz.src;
 
 import java.awt.Color;
 import java.awt.Dimension;
-import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
@@ -221,6 +220,7 @@ public class Neuroticz {
 		    + NODE_SHIFT.y);
 	    row++;
 	}
+	Display.repaint();
     }
 
     public void drawSynapses(NNetwork net) {

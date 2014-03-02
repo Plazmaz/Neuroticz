@@ -4,11 +4,8 @@ import java.util.ArrayList;
 
 import me.dylan.NNL.HiddenNode;
 import me.dylan.NNL.Input;
-import me.dylan.NNL.NNLib;
 import me.dylan.NNL.NNetwork;
-import me.dylan.NNL.Output;
 import me.dylan.NNL.Synapse;
-import me.dylan.NNL.Utils.ArrayUtil;
 import me.dylan.NNL.Utils.NetworkUtil;
 import me.dylan.NNL.Visualizer.Display;
 
