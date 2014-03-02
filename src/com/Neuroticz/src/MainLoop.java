@@ -64,6 +64,7 @@ public class MainLoop implements Runnable {
 	doGenerationTick(net);
 	for(Synapse synapse : net.getNetworkSynapses()) {
 	    synapse.hasPulsedInTick = false;
+//	    synapse.setPulseBack(false);
 	}
 //	System.out.println("Network count is " + allNetworks.size()
 //		+ " at generation " + generation

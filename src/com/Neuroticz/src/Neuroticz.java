@@ -2,6 +2,7 @@ package com.Neuroticz.src;
 
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
@@ -79,7 +80,6 @@ public class Neuroticz {
 			ZOOM_FACTOR -= 0.5;
 		    }
 		}
-		System.out.println("Updated zoom to " + ZOOM_FACTOR);
 		panning = false;
 	    }
 
@@ -161,7 +161,7 @@ public class Neuroticz {
 				0));
 		    }
 		     try {
-		     Thread.sleep(50);
+		     Thread.sleep(10);
 		     } catch (InterruptedException e) {
 		     e.printStackTrace();
 		     }
@@ -241,9 +241,9 @@ public class Neuroticz {
 		Display.setDisplayBackgroundColor(NetworkUtil
 			.returnWeightColor(connection.getSynapseWeight()));
 		if(connection.doesPulseBack())
-		    Display.setDisplayBackgroundColor(Color.ORANGE);
-		else if(connection.hasPulsedInTick)
-		    Display.setDisplayBackgroundColor(Color.BLUE);
+		    Display.setDisplayBackgroundColor(Color.MAGENTA);
+//		else if(connection.hasPulsedInTick)
+//		    Display.setDisplayBackgroundColor(Color.BLUE);
 		Display.drawLine(originDrawingPoint.x, originDrawingPoint.y,
 			destinationDrawingPoint.x, destinationDrawingPoint.y);
 		Display.setDisplayBackgroundColor(displayColor);
