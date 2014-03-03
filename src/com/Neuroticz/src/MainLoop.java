@@ -60,7 +60,7 @@ public class MainLoop implements Runnable {
 	// System.out.println("Paint Milis: " + timer.getElapsedTimeMilis());
 	doGenerationTick(net);
 	for(Synapse synapse : net.getNetworkSynapses()) {
-//	    synapse.hasPulsedInTick = false;
+	    synapse.hasPulsedInTick = false;
 //	    synapse.setPulseBack(false);
 	}
 	for(Input in : net.getInputNodesInNetwork()) {
@@ -76,7 +76,7 @@ public class MainLoop implements Runnable {
 //	    in.deactiveInputNode();
 //	}
 	try {
-	    Thread.sleep(20);
+	    Thread.sleep(1000);
 	} catch (InterruptedException e) {
 	    e.printStackTrace();
 	}
