@@ -71,11 +71,6 @@ public class MainLoop implements Runnable {
 				+ " and the Output fitness is "
 				+ parentNet.getNetworkSimilarityPercentage() + "%");
 		System.out.println("Output: " + parentNet.getNetworkOutput());
-
-		/*
-		 * try { Thread.sleep(1000); } catch (InterruptedException e) {
-		 * e.printStackTrace(); }
-		 */
 	}
 
 }
