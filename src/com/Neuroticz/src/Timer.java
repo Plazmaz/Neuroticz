@@ -6,19 +6,24 @@ public class Timer {
 
     public Timer() {
     }
-
+    /**
+     * 
+     */
     public void start() {
 	start = System.currentTimeMillis();
     }
-
+    /**
+     * 
+     */
     public void end() {
 	end = System.currentTimeMillis();
     }
 
-    // public void reset() {
-    // end = 0;
-    // start = 0;
-    // }
+    /**
+     * Determines the total time that has passed since the Timer was started
+     * @return the total time passed in milliseconds
+     */
+    //TODO: Can we convert this to seconds/minutes/hours somewhere?
     public long getElapsedTimeMilis() {
 	return end - start;
     }

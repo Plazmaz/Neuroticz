@@ -39,6 +39,13 @@ public class Neuroticz {
 	MainLoop mainLoop;
 	String desiredOutput = "";
 
+	/**
+	 * The main class for Neuroticz. This function does the initial code to start
+	 * the network, begin processing the input data, creates the mainloop
+	 * functionality, and then starts the mainloop.
+	 */
+	// TODO: Lots of code here, maybe want to break it up? Not sure if we can..
+	// review with Dylan
 	public Neuroticz() {
 
 		Display.showDisplay("Neuroticz Visualizer", new Dimension(1400, 700),
@@ -166,6 +173,7 @@ public class Neuroticz {
 		new Neuroticz();
 	}
 
+	//TODO: More drawing stuff, do we want to document it?
 	public void draw(NNetwork network) {
 		drawSynapses(network);
 		int row = 0;
@@ -211,7 +219,8 @@ public class Neuroticz {
 			row++;
 		}
 	}
-
+	//TODO: More drawing stuff, do we want to document it?
+	// Left the commented code alone here because not sure if its used or not currently
 	public void drawSynapses(NNetwork net) {
 		// net.removeUnusedSynapses();
 		ArrayList<Synapse> synapsesClone = (ArrayList<Synapse>) net
@@ -236,10 +245,6 @@ public class Neuroticz {
 			Display.drawLine(originDrawingPoint.x, originDrawingPoint.y,
 					destinationDrawingPoint.x, destinationDrawingPoint.y);
 			Display.setDisplayBackgroundColor(displayColor);
-
-			// } else {
-			//
-			// }
 
 		}
 	}
