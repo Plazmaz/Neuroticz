@@ -40,12 +40,12 @@ public class Neuroticz {
 	String desiredOutput = "";
 
 	/**
-	 * The main class for Neuroticz. This function does the initial code to start
-	 * the network, begin processing the input data, creates the mainloop
+	 * The main class for Neuroticz. This function does the initial code to
+	 * start the network, begin processing the input data, creates the mainloop
 	 * functionality, and then starts the mainloop.
 	 */
-	// TODO: Lots of code here, maybe want to break it up? Not sure if we can..
-	// review with Dylan
+	// TODO: Dylan: Lots of code here, maybe want to break it up? Not sure if we
+	// can
 	public Neuroticz() {
 
 		Display.showDisplay("Neuroticz Visualizer", new Dimension(1400, 700),
@@ -124,9 +124,6 @@ public class Neuroticz {
 
 			NNetwork initialNet = NetworkUtil.initializeNetwork(0, 1, 1,
 					desiredOutput, tmpLines);
-			// initialNet.addOutputNodeToNetwork(new Output());
-			// Input inputNode = new Input(desiredOutput.split("\n"));
-			// initialNet.addInputNodeToNetwork(inputNode);
 			if (TestUtil.AnyNodesExist(initialNet)) {
 				TestUtil.WhatNodesExist(initialNet);
 			}
@@ -134,10 +131,8 @@ public class Neuroticz {
 					+ TestUtil.AHiddenNodeHasValue(initialNet));
 			System.out.println("Are all synapses properly assigned? "
 					+ TestUtil.IsSynapseCountProper(initialNet));
-			// initialNet.connectAll();
 			mainLoop.allNetworks.add(initialNet);
 		}
-		// net.randomizeConnections();
 		ThreadUtil.spinThreadForPool("mainLoop", mainLoop);
 		ThreadUtil.spinThreadForPool("drawThread", new Runnable() {
 			@Override
@@ -173,7 +168,7 @@ public class Neuroticz {
 		new Neuroticz();
 	}
 
-	//TODO: More drawing stuff, do we want to document it?
+	// TODO: Will be moved into Visualizer Util Eventually
 	public void draw(NNetwork network) {
 		drawSynapses(network);
 		int row = 0;
@@ -219,10 +214,9 @@ public class Neuroticz {
 			row++;
 		}
 	}
-	//TODO: More drawing stuff, do we want to document it?
-	// Left the commented code alone here because not sure if its used or not currently
+
+	// TODO: Will be moved into Visualizer Util Eventually
 	public void drawSynapses(NNetwork net) {
-		// net.removeUnusedSynapses();
 		ArrayList<Synapse> synapsesClone = (ArrayList<Synapse>) net
 				.getNetworkSynapses().clone();
 		for (Synapse connection : synapsesClone) {
@@ -238,14 +232,9 @@ public class Neuroticz {
 			Color displayColor = Display.getDisplayBackgroundColor();
 			Display.setDisplayBackgroundColor(NetworkUtil
 					.returnWeightColor(connection.getSynapseWeight()));
-			// if(connection.hasPulsedInTick)
-			// Display.setDisplayBackgroundColor(Color.MAGENTA);
-			// else if(connection.hasPulsedInTick)
-			// Display.setDisplayBackgroundColor(Color.BLUE);
 			Display.drawLine(originDrawingPoint.x, originDrawingPoint.y,
 					destinationDrawingPoint.x, destinationDrawingPoint.y);
 			Display.setDisplayBackgroundColor(displayColor);
-
 		}
 	}
 }

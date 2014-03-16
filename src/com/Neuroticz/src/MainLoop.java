@@ -48,8 +48,8 @@ public class MainLoop implements Runnable {
 	 * @param parentNet
 	 *            Network to which the nodes belong
 	 */
-	// TODO: MAY NEED TO CHANGE THE INPUT NODE DEACTIVATION FOR WHEN WE COMBINE
-	// TWO NODE VALUES AND FEED IT BACK THROUGH
+	// TODO: Reminder: MAY NEED TO CHANGE THE INPUT NODE DEACTIVATION FOR WHEN WE COMBINE
+	// TWO NODE VALUES AND FEED IT BACK THROUGH -- Review later
 	public void doMainLoopTick(NNetwork parentNet) {
 
 		for (Input in : parentNet.getInputNodesInNetwork()) {
