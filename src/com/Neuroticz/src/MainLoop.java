@@ -84,7 +84,7 @@ public class MainLoop implements Runnable {
 	ArrayList<NNetwork> networkClones = (ArrayList<NNetwork>) allNetworks
 		.clone();
 	int netcount = 0;
-	Display.clearRect(0, 0, Display.getWidth(), Display.getHeight());
+	Display.fillRect(0, 0, Display.getWidth(), Display.getHeight());
 	for (NNetwork net : networkClones) {
 
 	    netcount++;
@@ -95,7 +95,7 @@ public class MainLoop implements Runnable {
 		    * Neuroticz.NETWORK_DISPLAY_OFFSET_MULTIPLIER, 0));
 	}
 	try {
-	    Thread.sleep(20);
+	    Thread.sleep(2000);
 	} catch (InterruptedException e) {
 	    e.printStackTrace();
 	}
@@ -149,6 +149,8 @@ public class MainLoop implements Runnable {
 	}
 	//TODO: More drawing stuff, do we want to document it?
 	// Left the commented code alone here because not sure if its used or not currently
+	@Deprecated
+	//Deprecated on 4/2/14
 	public void drawSynapses(NNetwork net) {
 		// net.removeUnusedSynapses();
 		ArrayList<Synapse> synapsesClone = (ArrayList<Synapse>) net
@@ -166,10 +168,6 @@ public class MainLoop implements Runnable {
 			Color displayColor = Display.getDisplayBackgroundColor();
 			Display.setDisplayBackgroundColor(NetworkUtil
 					.returnWeightColor(connection.getSynapseWeight()));
-			// if(connection.hasPulsedInTick)
-			// Display.setDisplayBackgroundColor(Color.MAGENTA);
-			// else if(connection.hasPulsedInTick)
-			// Display.setDisplayBackgroundColor(Color.BLUE);
 			Display.drawLine(originDrawingPoint.x, originDrawingPoint.y,
 					destinationDrawingPoint.x, destinationDrawingPoint.y);
 			Display.setDisplayBackgroundColor(displayColor);
